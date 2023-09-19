@@ -75,30 +75,35 @@ llm = get_text_model(pat)
 df = load_database()
 
 
-st.header("`Goverment Schemes Explorer`")
-st.info("`I am an AI that can given information about different government schemes applicable to you.`")
+st.header("`योजना साथी`")
+st.info("`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में`")
 
-
+gender_map = {"Male":"पुरुष (Male)", "Female":"स्त्री (Female)", "Others":"अन्य  (Others)"}
+category_map = {"SC":"अनुसूचित जाति (Scheduled Caste)", "ST":"अनुसूचित जनजाति  (Scheduled Tribes)", "OBC":"अन्य पिछड़ी जाति (Other backward classes)", "General":"सामान्य (General)"}
+occupation_map = {"Farmer":"किसान  (Farmer)", "Student":"विद्यार्थी (Student)","Retired": "रिटायर्ड (Retired)"}
 st.subheader('User Information', divider="green")
 with st.form("my_form"):
     gender = st.selectbox(
         "Gender: ",
-        ("Male", "Female", "Others")
+        ("Male", "Female", "Others"),
+        format_func=lambda x: gender_map[x]
     )
     occupation = st.selectbox(
-        "Occupation: ",
-        ("Student", "Farmers", "Retired")
+        "व्यवसाय (Occupation): ",
+        ("Student", "Farmer", "Retired"),
+        format_func=lambda x: occupation_map[x]
     )
     category = st.selectbox(
-        "Gender: ",
-        ("SC", "ST", "OBC", "General")
+        "Category: ",
+        ("General", "SC", "ST", "OBC"),
+        format_func=lambda x: category_map[x]
     )
  
     # Every form must have a submit button.
-    submitted = st.form_submit_button("Submit")
+    submitted = st.form_submit_button("भेजें  (Submit)")
 
 if submitted:
-    st.subheader('Schemes', divider="green")
+    st.subheader('योजनाएं  (Schemes)', divider="green")
     st.write(gender, occupation, category)
     filtered_df = df.loc[
         df.apply(
