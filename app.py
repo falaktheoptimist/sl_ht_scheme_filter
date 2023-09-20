@@ -130,8 +130,7 @@ with st.form("my_form"):
         ("General", "SC", "ST", "OBC"),
         format_func=lambda x: category_map[x],
     )
-
-    # Every form must have a submit button.
+    language = st.radio("Language for Summary:", ["Hindi", "English"], horizontal=True)
     submitted = st.form_submit_button("भेजें  (Submit)")
 
 if submitted:
@@ -150,9 +149,8 @@ if submitted:
         )
     ]
     for idx, row in filtered_df.iterrows():
-        normal_tab, hindi_tab = st.tabs(["English", "हिंदी"])
-        with normal_tab:
+        if language == "English":
             st.markdown(row["Summary"])
-        with hindi_tab:
+        else:
             st.markdown(row["hindi_summary"])
         st.divider()
