@@ -113,7 +113,6 @@ category_map = {
 occupation_map = {
     "Farmers": "किसान  (Farmer)",
     "Student": "विद्यार्थी (Student)",
-    "Retired": "रिटायर्ड (Retired)",
 }
 st.subheader("User Information", divider="green")
 with st.form("my_form"):
@@ -122,7 +121,7 @@ with st.form("my_form"):
     )
     occupation = st.selectbox(
         "व्यवसाय (Occupation): ",
-        ("Student", "Farmers", "Retired"),
+        ("Student", "Farmers"),
         format_func=lambda x: occupation_map[x],
     )
     category = st.selectbox(
