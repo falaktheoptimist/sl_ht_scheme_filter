@@ -136,7 +136,6 @@ with st.form("my_form"):
 
 if submitted:
     st.subheader("योजनाएं  (Schemes)", divider="green")
-    st.write(gender, occupation, category)
     filtered_df = df.loc[
         df.apply(lambda x: gender in x["gender"] or "None" in x["gender"], axis=1)
     ]
