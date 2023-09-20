@@ -1,5 +1,6 @@
 import os
 from ast import literal_eval
+from PIL import Image
 
 import pandas as pd
 import streamlit as st
@@ -9,6 +10,7 @@ from langchain.document_loaders import BSHTMLLoader
 
 
 st.set_page_config(layout="centered")
+
 
 @st.cache_data
 def load_pat():
@@ -63,64 +65,95 @@ Response:"""
 
 @st.cache_data
 def load_database():
-    df = pd.read_csv("database.csv", converters={
-        "gender": literal_eval,
-        "occupation": literal_eval,
-        "category": literal_eval
-    })
+    df = pd.read_csv(
+        "database.csv",
+        converters={
+            "gender": literal_eval,
+            "occupation": literal_eval,
+            "category": literal_eval,
+        },
+    )
     return df
+
 
 pat = load_pat()
 llm = get_text_model(pat)
 df = load_database()
+image = Image.open("banner.png")
 
 
 st.header("`योजना साथी`")
-st.info("`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में`")
+st.image(image, caption="योजना साथी")
+st.info(
+    "`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में`"
+)
+st.markdown(
+    f"""
+    <style>
+    .stTabs {{
+        background: #ffffff10;
+        padding: 8px 16px;
+        border-radius: 4px;
+    }}
+    """,
+    unsafe_allow_html=True
+)
 
-gender_map = {"Male":"पुरुष (Male)", "Female":"स्त्री (Female)", "Others":"अन्य  (Others)"}
-category_map = {"SC":"अनुसूचित जाति (Scheduled Caste)", "ST":"अनुसूचित जनजाति  (Scheduled Tribes)", "OBC":"अन्य पिछड़ी जाति (Other backward classes)", "General":"सामान्य (General)"}
-occupation_map = {"Farmer":"किसान  (Farmer)", "Student":"विद्यार्थी (Student)","Retired": "रिटायर्ड (Retired)"}
-st.subheader('User Information', divider="green")
+gender_map = {
+    "Male": "पुरुष (Male)",
+    "Female": "स्त्री (Female)",
+    "Others": "अन्य  (Others)",
+}
+category_map = {
+    "SC": "अनुसूचित जाति (Scheduled Caste)",
+    "ST": "अनुसूचित जनजाति  (Scheduled Tribes)",
+    "OBC": "अन्य पिछड़ी जाति (Other backward classes)",
+    "General": "सामान्य (General)",
+}
+occupation_map = {
+    "Farmer": "किसान  (Farmer)",
+    "Student": "विद्यार्थी (Student)",
+    "Retired": "रिटायर्ड (Retired)",
+}
+st.subheader("User Information", divider="green")
 with st.form("my_form"):
     gender = st.selectbox(
-        "Gender: ",
-        ("Male", "Female", "Others"),
-        format_func=lambda x: gender_map[x]
+        "Gender: ", ("Male", "Female", "Others"), format_func=lambda x: gender_map[x]
     )
     occupation = st.selectbox(
         "व्यवसाय (Occupation): ",
         ("Student", "Farmer", "Retired"),
-        format_func=lambda x: occupation_map[x]
+        format_func=lambda x: occupation_map[x],
     )
     category = st.selectbox(
         "Category: ",
         ("General", "SC", "ST", "OBC"),
-        format_func=lambda x: category_map[x]
+        format_func=lambda x: category_map[x],
     )
- 
+
     # Every form must have a submit button.
     submitted = st.form_submit_button("भेजें  (Submit)")
 
 if submitted:
-    st.subheader('योजनाएं  (Schemes)', divider="green")
+    st.subheader("योजनाएं  (Schemes)", divider="green")
     st.write(gender, occupation, category)
     filtered_df = df.loc[
-        df.apply(
-            lambda x: gender in x["gender"] or "None" in x["gender"], 
-            axis=1
+        df.apply(lambda x: gender in x["gender"] or "None" in x["gender"], axis=1)
+    ]
+    filtered_df = filtered_df.loc[
+        filtered_df.apply(
+            lambda x: occupation in x["occupation"] or "None" in x["occupation"], axis=1
         )
     ]
     filtered_df = filtered_df.loc[
         filtered_df.apply(
-            lambda x: occupation in x["occupation"] or "None" in x["occupation"], 
-            axis=1
+            lambda x: category in x["category"] or "None" in x["category"], axis=1
         )
     ]
-    filtered_df = filtered_df.loc[
-        filtered_df.apply(
-            lambda x: category in x["category"] or "None" in x["category"], 
-            axis=1
-        )
-    ]
-    st.dataframe(filtered_df)
+    for idx, row in filtered_df.iterrows():
+        normal_tab, hindi_tab = st.tabs(["English", "हिंदी"])
+        with normal_tab:
+            st.markdown(row["Summary"])
+        with hindi_tab:
+            st.markdown(row["hindi_summary"])
+        st.divider()
