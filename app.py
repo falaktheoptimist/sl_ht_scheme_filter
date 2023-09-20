@@ -82,7 +82,7 @@ df = load_database()
 image = Image.open("banner.png")
 
 
-st.header("`योजना साथी`")
+st.title("`योजना साथी`")
 st.image(image, caption="योजना साथी")
 st.info(
     "`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में`"
@@ -111,7 +111,7 @@ category_map = {
     "General": "सामान्य (General)",
 }
 occupation_map = {
-    "Farmer": "किसान  (Farmer)",
+    "Farmers": "किसान  (Farmer)",
     "Student": "विद्यार्थी (Student)",
     "Retired": "रिटायर्ड (Retired)",
 }
@@ -122,7 +122,7 @@ with st.form("my_form"):
     )
     occupation = st.selectbox(
         "व्यवसाय (Occupation): ",
-        ("Student", "Farmer", "Retired"),
+        ("Student", "Farmers", "Retired"),
         format_func=lambda x: occupation_map[x],
     )
     category = st.selectbox(
