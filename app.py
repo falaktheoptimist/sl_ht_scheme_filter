@@ -122,7 +122,6 @@ category_map = {
     "OBC": "अन्य पिछड़ी जाति (Other backward classes)",
     "General": "सामान्य (General)",
 }
-
 st.subheader("User Information", divider="green")
 with st.form("my_form"):
     beneficiary = st.selectbox(
