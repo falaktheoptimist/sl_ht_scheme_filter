@@ -66,7 +66,7 @@ Response:"""
 @st.cache_data
 def load_database():
     df = pd.read_csv(
-        "database.csv",
+        "new_database.csv",
         converters={
             "gender": literal_eval,
             "occupation": literal_eval,
@@ -85,7 +85,7 @@ image = Image.open("banner.png")
 st.title("`योजना साथी`")
 st.image(image, caption="योजना साथी")
 st.info(
-    "`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में`"
+    "`नमस्ते! मैं हूँ  आपका AI साथी जो आपको देगा हर जानकारी सरकारी योजनाओ के विषय में (Hello! I am your AI companion who will provide you with information on government schemes)`"
 )
 st.markdown(
     f"""
@@ -99,58 +99,72 @@ st.markdown(
     unsafe_allow_html=True
 )
 
+beneficiary_map = {
+    "farmers": "किसान (Farmers)",
+    "pregnant women": "गर्भवती महिलाएँ (Pregnant Women)",
+    "students": "विद्यार्थी (Students)",
+    "person with disability": "दिव्यांग व्यक्ति (Specially Abled Person)",
+    "journalists": "पत्रकार (Journalist)",
+    "SC/ST": "अनुसूचित जाति/अनुसूचित जनजाति (SC/ST)"
+}
+
 gender_map = {
+    "None": "कोई नहीं (None)", 
     "Male": "पुरुष (Male)",
     "Female": "स्त्री (Female)",
     "Others": "अन्य  (Others)",
 }
+
 category_map = {
+    "None": "कोई नहीं (None)", 
     "SC": "अनुसूचित जाति (Scheduled Caste)",
     "ST": "अनुसूचित जनजाति  (Scheduled Tribes)",
     "OBC": "अन्य पिछड़ी जाति (Other backward classes)",
     "General": "सामान्य (General)",
 }
-occupation_map = {
-    "Farmers": "किसान  (Farmer)",
-    "Student": "विद्यार्थी (Student)",
-    "Retired": "रिटायर्ड (Retired)",
-}
+
 st.subheader("User Information", divider="green")
 with st.form("my_form"):
-    gender = st.selectbox(
-        "Gender: ", ("Male", "Female", "Others"), format_func=lambda x: gender_map[x]
+    beneficiary = st.selectbox(
+        "लाभार्थी (Beneficiary): ", 
+        tuple(beneficiary_map.keys()),
+        format_func=lambda x: beneficiary_map[x]
     )
-    occupation = st.selectbox(
-        "व्यवसाय (Occupation): ",
-        ("Student", "Farmers", "Retired"),
-        format_func=lambda x: occupation_map[x],
+    st.divider()
+    gender = st.selectbox(
+        "Gender(Optional): ", 
+        tuple(gender_map.keys()), 
+        format_func=lambda x: gender_map[x]
     )
     category = st.selectbox(
-        "Category: ",
-        ("General", "SC", "ST", "OBC"),
-        format_func=lambda x: category_map[x],
+        "Category (Optional): ",
+        tuple(category_map.keys()),
+        format_func=lambda x: category_map[x]
     )
+    st.divider()
     language = st.radio("Language for Summary:", ["Hindi", "English"], horizontal=True)
     submitted = st.form_submit_button("भेजें  (Submit)")
 
 if submitted:
     st.subheader("योजनाएं  (Schemes)", divider="green")
     filtered_df = df.loc[
-        df.apply(lambda x: gender in x["gender"] or "None" in x["gender"], axis=1)
+        df.apply(lambda x: beneficiary in x["beneficiary"], axis=1)
     ]
-    filtered_df = filtered_df.loc[
-        filtered_df.apply(
-            lambda x: occupation in x["occupation"] or "None" in x["occupation"], axis=1
-        )
-    ]
-    filtered_df = filtered_df.loc[
-        filtered_df.apply(
-            lambda x: category in x["category"] or "None" in x["category"], axis=1
-        )
-    ]
+    if gender != "None":
+        filtered_df = filtered_df.loc[
+            filtered_df.apply(
+                lambda x: gender in x["gender"] or "any" in x["gender"], axis=1
+            )
+        ]
+    if category != "None":
+        filtered_df = filtered_df.loc[
+            filtered_df.apply(
+                lambda x: category in x["category"] or "any" in x["category"], axis=1
+            )
+        ]
     for idx, row in filtered_df.iterrows():
         if language == "English":
-            st.markdown(row["Summary"])
+            st.markdown(row["summary"])
         else:
             st.markdown(row["hindi_summary"])
         st.divider()
