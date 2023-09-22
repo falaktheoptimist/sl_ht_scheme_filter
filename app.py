@@ -110,9 +110,9 @@ beneficiary_map = {
 
 gender_map = {
     "None": "कोई नहीं (None)", 
-    "Male": "पुरुष (Male)",
-    "Female": "स्त्री (Female)",
-    "Others": "अन्य  (Others)",
+    "male": "पुरुष (Male)",
+    "female": "स्त्री (Female)",
+    "others": "अन्य  (Others)",
 }
 
 category_map = {
